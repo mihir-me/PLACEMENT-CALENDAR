@@ -7,22 +7,16 @@ const eventRoutes = require('./routes/events');
 
 const app = express();
 
-const allowedOrigins = [
-  process.env.CLIENT_URL,
-  'http://localhost:5173',
-  'http://localhost:3000'
-].filter(Boolean);
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+
+console.log('CORS allowed origin:', CLIENT_URL);
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    credentials: true
+    origin: CLIENT_URL,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   })
 );
 
@@ -43,7 +37,7 @@ app.get('/api/health', (req, res) => {
       connected: mongoose.connection.readyState === 1,
       name: mongoose.connection.name || null
     },
-    environment: process.env.NODE_ENV || 'development'
+    cors: CLIENT_URL
   });
 });
 
