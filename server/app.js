@@ -31,7 +31,12 @@ app.use(cors({
 app.use(express.json());
 
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Server is running' });
+  res.json({ success: true, message: 'Server is running', env: {
+    hasMongo: !!process.env.MONGODB_URI,
+    hasJwt: !!process.env.JWT_SECRET,
+    hasClientUrl: !!process.env.CLIENT_URL,
+    nodeEnv: process.env.NODE_ENV,
+  }});
 });
 
 app.use('/api/auth', authRoutes);
@@ -46,7 +51,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('Unhandled error:', err.message || err);
   res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
