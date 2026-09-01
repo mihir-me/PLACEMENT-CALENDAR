@@ -1,43 +1,49 @@
 const express = require('express');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-
+const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 
+dotenv.config();
+
 const app = express();
 
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
+connectDB();
+
+const rawOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+const CLIENT_URL = rawOrigin.replace(/\/+$/, '');
 
 console.log('CORS allowed origin:', CLIENT_URL);
 
 app.use(
   cors({
-    origin: CLIENT_URL,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+      const normalized = origin.replace(/\/+$/, '');
+      if (normalized === CLIENT_URL) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Placement Calendar API is running'
-  });
-});
-
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
-    message: 'Placement Calendar API is healthy',
+    message: 'Server is running',
+    cors: CLIENT_URL,
     database: {
       connected: mongoose.connection.readyState === 1,
-      name: mongoose.connection.name || null
     },
-    cors: CLIENT_URL
   });
 });
 
@@ -45,12 +51,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err);
-
-  res.status(500).json({
-    success: false,
-    message: 'Internal server error'
-  });
+  console.error('Unhandled error:', err.message || err);
+  res.status(500).json({ success: false, message: 'Internal server error' });
 });
 
 module.exports = app;
