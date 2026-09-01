@@ -1,58 +1,62 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+const mongoose = require('mongoose');
+
 const authRoutes = require('./routes/auth');
 const eventRoutes = require('./routes/events');
 
-dotenv.config();
-
 const app = express();
-
-connectDB();
 
 const allowedOrigins = [
   process.env.CLIENT_URL,
   'http://localhost:5173',
-  'http://localhost:3000',
+  'http://localhost:3000'
 ].filter(Boolean);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(null, true);
-    }
-  },
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true
+  })
+);
+
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Placement Calendar API is running'
+  });
+});
+
 app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'Server is running', env: {
-    hasMongo: !!process.env.MONGODB_URI,
-    hasJwt: !!process.env.JWT_SECRET,
-    hasClientUrl: !!process.env.CLIENT_URL,
-    nodeEnv: process.env.NODE_ENV,
-  }});
+  res.json({
+    success: true,
+    message: 'Placement Calendar API is healthy',
+    database: {
+      connected: mongoose.connection.readyState === 1,
+      name: mongoose.connection.name || null
+    },
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
 
-if (process.env.NODE_ENV === 'production') {
-  const clientBuildPath = path.join(__dirname, '..', 'client', 'dist');
-  app.use(express.static(clientBuildPath));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
-}
-
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err.message || err);
-  res.status(500).json({ success: false, message: 'Internal server error' });
+  console.error('Unhandled error:', err);
+
+  res.status(500).json({
+    success: false,
+    message: 'Internal server error'
+  });
 });
 
 module.exports = app;

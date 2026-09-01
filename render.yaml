@@ -4,14 +4,14 @@ services:
     runtime: node
     region: oregon
     rootDir: server
-    buildCommand: npm install && cd ../client && npm install && npm run build
-    startCommand: node server.js
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
       - key: MONGODB_URI
         sync: false
       - key: JWT_SECRET
-        generateValue: true
+        sync: false
       - key: CLIENT_URL
         sync: false
