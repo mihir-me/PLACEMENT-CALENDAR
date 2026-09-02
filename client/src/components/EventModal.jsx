@@ -9,7 +9,7 @@ const STATUS_LABELS = {
 
 const PLACE_LABELS = {
   RVITM: 'RVITM',
-  RVECE: 'RVECE',
+  RVCE: 'RVCE',
   HOME: 'Home',
 };
 
