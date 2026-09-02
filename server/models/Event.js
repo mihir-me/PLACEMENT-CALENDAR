@@ -24,7 +24,7 @@ const eventSchema = new mongoose.Schema(
     },
     place: {
       type: String,
-      enum: ['RVITM', 'RVECE', 'HOME'],
+      enum: ['RVITM', 'RVCE', 'HOME'],
       required: [true, 'Place is required'],
     },
     offerType: {
