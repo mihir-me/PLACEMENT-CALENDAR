@@ -11,7 +11,7 @@ const STATUS_OPTIONS = [
 
 const PLACE_OPTIONS = [
   { value: 'RVITM', label: 'RVITM' },
-  { value: 'RVECE', label: 'RVECE' },
+  { value: 'RVCE', label: 'RVCE' },
   { value: 'HOME', label: 'Home' },
 ];
 
