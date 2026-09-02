@@ -1,7 +1,7 @@
 const Event = require('../models/Event');
 
 const VALID_STATUSES = ['OA', 'INTERVIEW_1', 'INTERVIEW_2', 'HR', 'PLACED', 'REJECTED'];
-const VALID_PLACES = ['RVITM', 'RVECE', 'HOME'];
+const VALID_PLACES = ['RVITM', 'RVCE', 'HOME'];
 const VALID_OFFER_TYPES = ['INTERN', 'INTERN_PBC', 'INTERN_FTE', 'FTE'];
 const VALID_PROGRESS = ['OA_CLEARED', 'OA_REJECTED', 'TI1', 'TI2', 'HR1', 'HR2', 'NOT_ELIGIBLE', 'PLACED'];
 
